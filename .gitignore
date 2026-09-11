@@ -1,0 +1,15 @@
+﻿# data / caches
+data/
+*.parquet
+*.csv
+*.jsonl
+outputs/
+runs/
+checkpoints/
+wandb/
+mlruns/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+*.log
