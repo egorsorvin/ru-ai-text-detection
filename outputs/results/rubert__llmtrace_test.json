@@ -1,0 +1,30 @@
+{
+  "model": "rubert",
+  "split": "llmtrace_test",
+  "time": "2026-09-12T22:25:36",
+  "accuracy": 0.5599292348518354,
+  "f1_macro": 0.4147888597110746,
+  "auroc": 0.43806640054719176,
+  "per_generator": {
+    "Human": 0.8976,
+    "gpt-4-1106-preview": 0.0228,
+    "gpt-4-0125-preview": 0.0206,
+    "o3-2025-04-16": 0.0464,
+    "gpt-3.5": 0.08,
+    "gigachat": 0.1474,
+    "GigaChat-Max": 0.0143,
+    "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B": 0.1045,
+    "databricks/dbrx-instruct": 0.0896,
+    "Qwen/Qwen2.5-72B-Instruct": 0.1364,
+    "01-ai/Yi-1.5-34B-Chat": 0.1094,
+    "llama-7b": 0.4286,
+    "yandex/YandexGPT-5-Lite-8B-instruct": 0.082,
+    "mistralai/Ministral-8B-Instruct-2410": 0.1207,
+    "Qwen/QwQ-32B": 0.1207,
+    "CohereForAI/c4ai-command-r-08-2024": 0.0536,
+    "google/gemma-2-27b-it": 0.0566,
+    "unsloth/Llama-3.3-70B-Instruct": 0.12,
+    "yagpt": 0.0714,
+    "ruGPT": 0.0769
+  }
+}

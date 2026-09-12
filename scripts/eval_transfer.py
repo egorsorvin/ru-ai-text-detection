@@ -1,0 +1,71 @@
+"""Evaluate detectors trained on CoAT on external Russian corpora (cross-corpus transfer).
+
+Usage:
+    python scripts/eval_transfer.py --run rubert --model ai-forever/ruBert-base
+    python scripts/eval_transfer.py --run ruroberta --model ai-forever/ruRoberta-large --bs 32
+    python scripts/eval_transfer.py --run tfidf_lr            # sklearn pipeline saved by baseline_tfidf.py
+"""
+import argparse
+import os
+import sys
+from pathlib import Path
+
+os.environ.setdefault("HF_HOME", r"E:\hf_cache")
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import joblib
+import numpy as np
+import torch
+from torch.utils.data import DataLoader
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
+
+from src.data import get_splits
+from src.evaluate import report
+from src.external_data import load_ainl, load_llmtrace_ru
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_sets():
+    _, _, coat_test = get_splits()
+    llm = load_llmtrace_ru()
+    ainl = load_ainl()
+    return {
+        "coat_test": coat_test,
+        "llmtrace_test": llm[llm.split == "test"].reset_index(drop=True),
+        "ainl_test": ainl[ainl.split == "test"].reset_index(drop=True),
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--run", required=True)
+    ap.add_argument("--model", default=None, help="HF model name for encoder runs; omit for tfidf")
+    ap.add_argument("--max_len", type=int, default=256)
+    ap.add_argument("--bs", type=int, default=64)
+    args = ap.parse_args()
+
+    sets = test_sets()
+    if args.model is None:
+        pipe = joblib.load(ROOT / "outputs" / "checkpoints" / f"{args.run}.joblib")
+        for name, df in sets.items():
+            score = pipe.predict_proba(df.text)[:, 1]
+            report(args.run, name, df, (score >= 0.5).astype(int), score)
+        return
+
+    from scripts.train_encoder import Collator, TextDataset, predict
+
+    device = torch.device("cuda")
+    tok = AutoTokenizer.from_pretrained(args.model)
+    model = AutoModelForSequenceClassification.from_pretrained(args.model, num_labels=2).to(device)
+    state = torch.load(ROOT / "outputs" / "checkpoints" / args.run / "best.pt", map_location=device)
+    model.load_state_dict(state)
+    collate = Collator(tok, args.max_len)
+    for name, df in sets.items():
+        loader = DataLoader(TextDataset(df.text, df.label), batch_size=args.bs, collate_fn=collate)
+        pred, prob = predict(model, loader, device)
+        report(args.run, name, df, pred, prob)
+
+
+if __name__ == "__main__":
+    main()

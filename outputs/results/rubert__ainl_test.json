@@ -1,0 +1,15 @@
+{
+  "model": "rubert",
+  "split": "ainl_test",
+  "time": "2026-09-12T22:26:01",
+  "accuracy": 0.22718163599927127,
+  "f1_macro": 0.2085583363814136,
+  "auroc": 0.6266853113894498,
+  "per_generator": {
+    "gpt-4-turbo": 0.0,
+    "gemma-2-27b": 0.0186,
+    "llama-3.3-70b": 0.0472,
+    "Human": 0.9526,
+    "unknown": 0.1197
+  }
+}

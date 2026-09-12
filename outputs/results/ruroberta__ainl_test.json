@@ -1,0 +1,15 @@
+{
+  "model": "ruroberta",
+  "split": "ainl_test",
+  "time": "2026-09-12T22:30:22",
+  "accuracy": 0.2372927673528876,
+  "f1_macro": 0.22067630871949767,
+  "auroc": 0.6442493202228543,
+  "per_generator": {
+    "gpt-4-turbo": 0.0,
+    "gemma-2-27b": 0.0163,
+    "llama-3.3-70b": 0.0281,
+    "Human": 0.9594,
+    "unknown": 0.1855
+  }
+}

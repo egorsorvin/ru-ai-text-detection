@@ -1,0 +1,15 @@
+{
+  "model": "tfidf_lr",
+  "split": "ainl_test",
+  "time": "2026-09-12T22:24:02",
+  "accuracy": 0.4321370012752778,
+  "f1_macro": 0.42770574172346165,
+  "auroc": 0.7122371305605537,
+  "per_generator": {
+    "gpt-4-turbo": 0.2921,
+    "gemma-2-27b": 0.2564,
+    "llama-3.3-70b": 0.3032,
+    "Human": 0.8614,
+    "unknown": 0.4501
+  }
+}
