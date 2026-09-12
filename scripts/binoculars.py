@@ -57,20 +57,19 @@ def binoculars_scores(texts, tok, observer, performer, max_len, bs, device):
     for i in range(0, len(texts), bs):
         idx = order[i:i + bs]
         enc = tok([texts[j] for j in idx], return_tensors="pt", padding=True, truncation=True, max_length=max_len).to(device)
-        obs_logits = observer(**enc).logits[:, :-1].float()
-        perf_logits = performer(**enc).logits[:, :-1].float()
+        obs_logits = observer(**enc).logits[:, :-1]
+        perf_logits = performer(**enc).logits[:, :-1]
         labels = enc.input_ids[:, 1:]
-        mask = enc.attention_mask[:, 1:].float()
+        lengths = enc.attention_mask[:, 1:].sum(1)
 
-        nll = F.cross_entropy(perf_logits.transpose(1, 2), labels, reduction="none")
-        ppl = (nll * mask).sum(1) / mask.sum(1)
-
-        p_obs = F.softmax(obs_logits, dim=-1)
-        logq_perf = F.log_softmax(perf_logits, dim=-1)
-        xent = -(p_obs * logq_perf).sum(-1)
-        x_ppl = (xent * mask).sum(1) / mask.sum(1)
-
-        out[idx] = (ppl / x_ppl).cpu().numpy()
+        for k in range(len(idx)):
+            n = int(lengths[k])
+            o = obs_logits[k, :n].float()
+            p = perf_logits[k, :n].float()
+            ppl = F.cross_entropy(p, labels[k, :n])
+            x_ppl = -(F.softmax(o, dim=-1) * F.log_softmax(p, dim=-1)).sum(-1).mean()
+            out[idx[k]] = (ppl / x_ppl).item()
+        del obs_logits, perf_logits
     return out
 
 
