@@ -1,0 +1,12 @@
+﻿accelerate==1.15.0
+datasets==5.0.1
+numpy==2.5.3
+pandas==3.0.5
+pyarrow==25.0.1
+safetensors==0.8.0
+scikit-learn==1.9.1
+scipy==1.18.1
+tokenizers==0.22.2
+torch==2.14.0+cu126
+tqdm==4.70.1
+transformers==4.57.6

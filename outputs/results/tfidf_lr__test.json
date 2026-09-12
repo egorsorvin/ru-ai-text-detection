@@ -1,0 +1,24 @@
+{
+  "model": "tfidf_lr",
+  "split": "test",
+  "time": "2026-09-11T21:30:41",
+  "accuracy": 0.7593389637810622,
+  "f1_macro": 0.7592104339587995,
+  "auroc": 0.8473185828912024,
+  "per_generator": {
+    "Human": 0.7824,
+    "ruGPT3-Large": 0.8596,
+    "ruGPT3-Small": 0.9186,
+    "ruGPT3-Medium": 0.8995,
+    "M-BART50": 0.6404,
+    "ruT5-Base": 0.4765,
+    "mT5-Small": 0.6598,
+    "ruT5-Base-Multitask": 0.4385,
+    "ruGPT2-Large": 0.8455,
+    "OPUS-MT": 0.6443,
+    "M2M-100": 0.5891,
+    "mT5-Large": 0.5456,
+    "ruT5-Large": 0.386,
+    "M-BART": 0.5676
+  }
+}

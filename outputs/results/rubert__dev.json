@@ -1,0 +1,24 @@
+{
+  "model": "rubert",
+  "split": "dev",
+  "time": "2026-09-12T16:50:16",
+  "accuracy": 0.8578886310904872,
+  "f1_macro": 0.8576016108825355,
+  "auroc": 0.9420437753349733,
+  "per_generator": {
+    "Human": 0.9028,
+    "ruGPT3-Large": 0.8908,
+    "ruGPT3-Small": 0.962,
+    "ruGPT3-Medium": 0.9374,
+    "M-BART50": 0.7333,
+    "ruT5-Base": 0.8785,
+    "mT5-Small": 0.839,
+    "ruT5-Base-Multitask": 0.4864,
+    "ruGPT2-Large": 0.8853,
+    "M2M-100": 0.5305,
+    "OPUS-MT": 0.5718,
+    "mT5-Large": 0.6346,
+    "ruT5-Large": 0.4731,
+    "M-BART": 0.8077
+  }
+}
