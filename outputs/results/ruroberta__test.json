@@ -1,0 +1,24 @@
+{
+  "model": "ruroberta",
+  "split": "test",
+  "time": "2026-09-12T19:45:53",
+  "accuracy": 0.8777813870391424,
+  "f1_macro": 0.8776567730687508,
+  "auroc": 0.9545455345823588,
+  "per_generator": {
+    "Human": 0.9097,
+    "ruGPT3-Large": 0.9237,
+    "ruGPT3-Small": 0.981,
+    "ruGPT3-Medium": 0.9692,
+    "M-BART50": 0.7779,
+    "ruT5-Base": 0.8978,
+    "mT5-Small": 0.853,
+    "ruT5-Base-Multitask": 0.5511,
+    "ruGPT2-Large": 0.8872,
+    "OPUS-MT": 0.7002,
+    "M2M-100": 0.5572,
+    "mT5-Large": 0.6227,
+    "ruT5-Large": 0.5351,
+    "M-BART": 0.7872
+  }
+}
