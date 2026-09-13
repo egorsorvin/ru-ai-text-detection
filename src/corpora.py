@@ -27,7 +27,7 @@ def load_corpus(name: str) -> pd.DataFrame:
         df = load_ainl().copy()
         # AINL ships no dev split: carve a fixed 5% of train (stratified by generator) for model selection
         train = df[df.split == "train"]
-        dev_idx = train.groupby("generator", group_keys=False).apply(lambda g: g.sample(frac=0.05, random_state=SEED)).index
+        dev_idx = pd.concat([g.sample(frac=0.05, random_state=SEED) for _, g in train.groupby("generator")]).index
         df.loc[dev_idx, "split"] = "dev"
         return df
     raise ValueError(name)
@@ -35,10 +35,8 @@ def load_corpus(name: str) -> pd.DataFrame:
 
 def balance(df: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
     n = df.label.value_counts().min()
-    return (df.groupby("label", group_keys=False)
-              .apply(lambda g: g.sample(n, random_state=seed))
-              .sample(frac=1, random_state=seed)
-              .reset_index(drop=True))
+    parts = [g.sample(n, random_state=seed) for _, g in df.groupby("label")]
+    return pd.concat(parts).sample(frac=1, random_state=seed).reset_index(drop=True)
 
 
 def train_mix(corpora: list[str], per_corpus_cap: int | None = None) -> pd.DataFrame:
