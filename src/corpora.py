@@ -6,6 +6,8 @@ so that mixing does not change the class prior seen by the model.
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 
 from src.data import load_coat
@@ -15,7 +17,17 @@ CORPORA = ("coat", "llmtrace", "ainl")
 SEED = 42
 
 
+GEN_DIR = Path(__file__).resolve().parents[1] / "data" / "gen"
+
+
+def gen_corpora() -> list[str]:
+    """Names of generated held-out test sets present on disk, e.g. gen_qwen38_27b."""
+    return sorted(f"gen_{p.name[: -len('_testset.parquet')]}" for p in GEN_DIR.glob("*_testset.parquet"))
+
+
 def load_corpus(name: str) -> pd.DataFrame:
+    if name.startswith("gen_"):
+        return pd.read_parquet(GEN_DIR / f"{name[4:]}_testset.parquet")
     if name == "coat":
         df = load_coat().copy()
         df["domain"] = "coat"
@@ -44,9 +56,9 @@ def train_mix(corpora: list[str], per_corpus_cap: int | None = None) -> pd.DataF
     parts = []
     for c in corpora:
         df = load_corpus(c)
-        tr = balance(df[df.split == "train"])
-        if per_corpus_cap and len(tr) > per_corpus_cap:
-            tr = tr.sample(per_corpus_cap, random_state=SEED).reset_index(drop=True)
+        tr = balance(df[df.split == "train"])  # already shuffled with SEED
+        if per_corpus_cap:
+            tr = tr.head(per_corpus_cap)  # same rows as scripts/score_binoculars.py --cap
         parts.append(tr)
     return pd.concat(parts, ignore_index=True)
 
@@ -57,5 +69,6 @@ def dev_mix(corpora: list[str], cap: int = 3000) -> pd.DataFrame:
     return pd.concat(parts, ignore_index=True)
 
 
-def test_sets() -> dict[str, pd.DataFrame]:
-    return {f"{c}_test": load_corpus(c).query("split == 'test'").reset_index(drop=True) for c in CORPORA}
+def test_sets(include_gen: bool = True) -> dict[str, pd.DataFrame]:
+    names = list(CORPORA) + (gen_corpora() if include_gen else [])
+    return {f"{c}_test": load_corpus(c).query("split == 'test'").reset_index(drop=True) for c in names}

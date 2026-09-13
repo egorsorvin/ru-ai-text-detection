@@ -33,11 +33,17 @@ OUT_DIR = ROOT / "data" / "gen"
 SEED = 42
 
 PROMPTS = {
-    "continue": "Продолжи этот текст на русском языке примерно до {words} слов. Выведи только продолжение, без вступлений и пояснений.\n\nТекст: {text}",
+    "continue": "Продолжи этот текст на русском языке. Напиши не менее {words} слов, несколько предложений в том же стиле. Выведи только продолжение, без вступлений и пояснений.\n\nТекст: {text}",
     "paraphrase": "Перескажи этот текст своими словами на русском языке, сохранив смысл и примерно ту же длину. Выведи только пересказ, без вступлений и пояснений.\n\nТекст: {text}",
     "simplify": "Перепиши этот текст на русском языке более простым языком, короткими предложениями, сохранив смысл. Выведи только переписанный текст, без вступлений и пояснений.\n\nТекст: {text}",
 }
 PREAMBLE = re.compile(r"^\s*(вот|конечно|разумеется|хорошо)[^\n]{0,80}:\s*\n", re.I)
+REFUSAL = re.compile(r"^\s*(извините|к сожалению|я не могу|как (языковая )?модель|i'm sorry|i cannot)", re.I)
+
+
+def latin_share(t: str) -> float:
+    letters = [c for c in t if c.isalpha()]
+    return sum(c.isascii() for c in letters) / max(1, len(letters))
 
 
 def build_jobs(n_per_task: int, min_words: int, max_words: int, seed: int) -> pd.DataFrame:
@@ -63,7 +69,14 @@ def build_jobs(n_per_task: int, min_words: int, max_words: int, seed: int) -> pd
 def clean(raw: str, job) -> str | None:
     t = re.sub(r"<think>.*?</think>", "", raw, flags=re.S).strip()
     t = PREAMBLE.sub("", t).strip().strip('"«»').strip()
+    if REFUSAL.match(t) or latin_share(t) > 0.3:  # off-task: refusal or non-Russian output
+        return None
     if job.task == "continue":
+        if len(t.split()) < max(8, int(0.4 * (job.words - 10))):
+            return None
+        last = job.head.split()[-1].lower().strip(".,;:!?")
+        if t.split()[0].lower().strip(".,;:!?") == last:  # model echoed the last prompt word
+            t = " ".join(t.split()[1:])
         t = job.head + " " + t
     words = t.split()
     if len(words) < 5 or t.strip() == job.source_text.strip():

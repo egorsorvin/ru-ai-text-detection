@@ -65,7 +65,7 @@ def load_features(tag, quant, corpus, split) -> pd.DataFrame:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--corpus", required=True, choices=["coat", "llmtrace", "ainl"])
+    ap.add_argument("--corpus", required=True, help="coat | llmtrace | ainl | gen_<tag>")
     ap.add_argument("--split", required=True, choices=["train", "dev", "test"])
     ap.add_argument("--cap", type=int, default=0, help="score at most N (balanced) texts of this split")
     ap.add_argument("--observer", default="Qwen/Qwen3-4B-Base")
@@ -78,7 +78,8 @@ def main():
 
     df = load_corpus(args.corpus).query("split == @args.split").reset_index(drop=True)
     if args.cap and len(df) > args.cap:
-        df = balance(df).head(args.cap) if args.split == "train" else df.sample(args.cap, random_state=0)
+        # train/dev: same rows as src.corpora.train_mix / dev_mix; test: same rows as train_mix --test_cap
+        df = balance(df).head(args.cap) if args.split in ("train", "dev") else df.sample(args.cap, random_state=0)
     path = cache_path(args.tag, args.quant, args.corpus, args.split)
     path.parent.mkdir(parents=True, exist_ok=True)
     done = pd.read_parquet(path) if path.exists() else pd.DataFrame(columns=["id", "score", "ppl", "xppl"])

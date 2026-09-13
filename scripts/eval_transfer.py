@@ -19,22 +19,10 @@ import torch
 from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-from src.data import get_splits
+from src.corpora import test_sets
 from src.evaluate import report
-from src.external_data import load_ainl, load_llmtrace_ru
 
 ROOT = Path(__file__).resolve().parents[1]
-
-
-def test_sets():
-    _, _, coat_test = get_splits()
-    llm = load_llmtrace_ru()
-    ainl = load_ainl()
-    return {
-        "coat_test": coat_test,
-        "llmtrace_test": llm[llm.split == "test"].reset_index(drop=True),
-        "ainl_test": ainl[ainl.split == "test"].reset_index(drop=True),
-    }
 
 
 def main():
@@ -43,9 +31,12 @@ def main():
     ap.add_argument("--model", default=None, help="HF model name for encoder runs; omit for tfidf")
     ap.add_argument("--max_len", type=int, default=256)
     ap.add_argument("--bs", type=int, default=64)
+    ap.add_argument("--only", default="", help="comma-separated test names to evaluate, e.g. gen_qwen38_27b_test")
     args = ap.parse_args()
 
     sets = test_sets()
+    if args.only:
+        sets = {k: v for k, v in sets.items() if k in args.only.split(",")}
     if args.model is None:
         pipe = joblib.load(ROOT / "outputs" / "checkpoints" / f"{args.run}.joblib")
         for name, df in sets.items():
