@@ -1,0 +1,15 @@
+{
+  "model": "binoculars_qwen3_4b_nf4_s3000",
+  "split": "ainl_test",
+  "time": "2026-09-13T12:02:30",
+  "accuracy": 0.37833333333333335,
+  "f1_macro": 0.37832165959560793,
+  "auroc": 0.8000509635292243,
+  "per_generator": {
+    "gemma-2-27b": 0.4016,
+    "unknown": 0.1645,
+    "gpt-4-turbo": 0.13,
+    "llama-3.3-70b": 0.2297,
+    "Human": 0.9812
+  }
+}

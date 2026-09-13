@@ -113,6 +113,7 @@ def main():
     ap.add_argument("--lr", type=float, default=2e-5)
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--eval_every", type=int, default=300)
+    ap.add_argument("--test_cap", type=int, default=0, help="smoke test: evaluate on at most N texts per test set")
     args = ap.parse_args()
 
     torch.manual_seed(42)
@@ -124,6 +125,8 @@ def main():
     train_df = train_mix(corpora, args.cap)
     dev_df = dev_mix(corpora, cap=1500)
     tests = test_sets()
+    if args.test_cap:
+        tests = {k: v.sample(min(len(v), args.test_cap), random_state=0).reset_index(drop=True) for k, v in tests.items()}
     if args.bino:
         train_df = attach_feats(train_df, args.bino_tag, args.bino_quant, allow_partial=True)
         dev_df = attach_feats(dev_df, args.bino_tag, args.bino_quant, allow_partial=True)
@@ -164,7 +167,7 @@ def main():
     model.load_state_dict(torch.load(out_dir / "best.pt", map_location=device))
     for name, df in tests.items():
         pred, prob = predict(model, mk(df, False), device)
-        report(args.run, name, df, pred, prob, save=True)
+        report(args.run, name, df, pred, prob, save=not args.test_cap)
     print(f"done in {(time.time()-t0)/60:.1f} min", flush=True)
 
 
