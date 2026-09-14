@@ -1,6 +1,6 @@
-# Cross-corpus generalization of Russian AI-generated text detectors
+﻿# Cross-corpus generalization of Russian AI-generated text detectors
 
-Course project (NLP). Detectors trained on the 2022-era CoAT corpus are evaluated on newer Russian
+Detectors trained on the 2022-era CoAT corpus are evaluated on newer Russian
 corpora (LLMTrace-ru, AINL-Eval 2025) and on a small held-out set generated with 2026 models; a
 zero-shot Binoculars detector with Russian-capable model pairs and an encoder + Binoculars-features
 model trained on corpus mixes are compared under a leave-one-corpus-out protocol.
