@@ -21,12 +21,18 @@ mixtures with Binoculars features.
   machine-written LLMTrace training texts come from the GPT-4 family, and it also contains Llama-3.3, Gemma-2 and
   Qwen models: the families behind AINL-Eval and both 2026 generators. These experiments do not separate corpus
   diversity from coverage of the test generator families.
-- **Binoculars works on Russian with a Russian-capable pair**, 0.61-0.80 AUROC on modern corpora, but only for
-  free continuation. Paraphrase and simplification of human texts stay at 0.51-0.66. Pair size and
-  native-Russian pretraining change little. A threshold calibrated on CoAT is useless on newer data, while a
-  threshold calibrated on other modern corpora is within 0.04 balanced accuracy of in-domain calibration.
-- **Binoculars features do not improve a multi-corpus encoder**: differences range from -0.03 to +0.03 AUROC
-  (single seed).
+- **With a Russian-capable model pair, Binoculars has a detection signal but is not a practical detector.** The
+  original paper reports low recall on Russian with its Falcon-7B pair, and LLMTrace reports an AI-class F1 of
+  0.02 on Russian. With Qwen3 and YandexGPT pairs, AUROC is 0.61-0.62 on LLMTrace-ru, 0.78-0.80 on AINL-Eval
+  and 0.57-0.70 on the 2026 sets. At a 5% false-positive rate the Qwen3-14B pair flags 12-35% of machine texts.
+  The signal comes from free continuation, 0.69-0.84 AUROC, while paraphrase and simplification stay at
+  0.51-0.66. The 4B, 8B and 14B pairs are within 0.04 AUROC of each other on the public corpora; on the 2026
+  sets the YandexGPT pair is about 0.1 lower than the Qwen pairs.
+- **A Binoculars threshold does not transfer from CoAT.** A threshold fitted on CoAT gives 0.50-0.63 balanced
+  accuracy on the newer corpora. A threshold fitted on the other modern corpora is within 0.04 of one fitted on
+  the test corpus itself.
+- **Binoculars features change the AUROC of a multi-corpus encoder by -0.03 to +0.03** in a single run, which
+  is within run-to-run noise.
 - **The practical regime is weak out of distribution.** At a 5% false-positive rate on human texts, the best
   models catch 36-44% of machine texts from the 2026 generators, while the same models catch 92-96% on the
   corpora seen in training. Texts are short, about 24 words on median.

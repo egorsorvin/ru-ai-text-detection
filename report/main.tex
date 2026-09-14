@@ -1,0 +1,97 @@
+\documentclass{article}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{mathtext}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{hyperref}
+
+
+\title{Cross-Era Generalization of Russian AI-Generated Text Detectors}
+\author{Egor Sorvin}
+\date{September 2026}
+
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Detectors of machine-generated Russian text are trained on corpora built with 2020--2022 generators, while the
+texts they meet today come from much newer models. We measure how such detectors transfer across corpora and
+generator eras. Encoders fine-tuned on CoAT, zero-shot Binoculars with Russian-capable model pairs, and encoders
+trained on corpus mixtures are evaluated on CoAT, LLMTrace, AINL-Eval 2025 and two new test sets generated with
+T-pro~2.0 and Qwen3.8-27B. ruRoBERTa-large trained on CoAT drops from 0.95 AUROC on CoAT to 0.52--0.64 on
+the newer corpora, and encoders trained on modern corpora score CoAT machine texts below human ones
+(0.46--0.48 AUROC). With Russian-capable model pairs, Binoculars separates free continuations from human text
+with up to 0.84 AUROC and paraphrases with at most 0.64; adding its features to a fine-tuned encoder changes
+AUROC by less than 0.04. Mixtures that include LLMTrace reach 0.79--0.82 AUROC on the 2026 test sets, but the
+training and test corpora share generator families, so the gain cannot be attributed to corpus diversity
+alone. Code:
+\url{https://github.com/egorsorvin/ru-ai-text-detection}.
+\end{abstract}
+
+
+\section{Introduction}
+Detectors of AI-generated text are used in education, content moderation and fraud screening. For Russian, the
+main public resources come from the RuATD 2022 shared task and its extension CoAT~\cite{shamardina2022ruatd,
+shamardina2025coat}, built with generators such as ruGPT-3 and ruT5. Generators have changed since then: current
+models write fluent text, and a detector that learned the artifacts of older models may miss it. In English,
+detection is known to degrade on unseen generators and domains~\cite{dugan2024raid}, but this has not been
+measured across Russian corpora of different eras.
+
+We evaluate three kinds of detectors on three public corpora, CoAT, LLMTrace~\cite{tolstykh2025llmtrace} and
+AINL-Eval~\cite{batura2025ainl}, under a leave-one-corpus-out protocol. We also build two test sets that pair
+CoAT human texts with outputs of 2026 generators, so the human side stays fixed and only the generator changes.
+Our contributions are:
+\begin{itemize}
+    \item a cross-corpus and cross-era evaluation of Russian detectors, including two new held-out test sets;
+    \item evidence that the shift goes both ways: ruRoBERTa-large trained on CoAT flags 14--17\% of machine
+    texts from 2026 generators, while encoders trained on modern corpora score ruGPT-3 outputs from CoAT as more
+    human than human texts (0.32--0.38 AUROC);
+    \item an analysis of Binoculars~\cite{hans2024binoculars} for Russian: with Russian-capable pairs it separates
+    free continuation from human text with 0.69--0.84 AUROC and paraphrase or simplification with 0.51--0.66,
+    and a threshold fitted on CoAT gives 0.50--0.63 balanced accuracy on newer corpora;
+    \item a negative result: adding Binoculars features to a multi-corpus encoder changes AUROC by $-0.03$ to
+    $+0.03$ in a single run, and the gains from corpus mixtures are confounded with generator families shared
+    between training and test corpora.
+\end{itemize}
+
+\subsection{Team}
+\textbf{Egor Sorvin} designed the study, built the test sets, ran the experiments and wrote the report.
+
+
+\section{Related Work}
+\label{sec:related}
+% TODO
+
+
+\section{Model Description}
+% TODO
+
+
+\section{Dataset}
+% TODO
+
+
+\section{Experiments}
+\subsection{Metrics}
+% TODO
+
+\subsection{Experiment Setup}
+% TODO
+
+\subsection{Baselines}
+% TODO
+
+
+\section{Results}
+% TODO
+
+
+\section{Conclusion}
+% TODO
+
+
+\bibliographystyle{apalike}
+\bibliography{lit}
+\end{document}
