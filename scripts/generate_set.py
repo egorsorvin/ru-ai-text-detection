@@ -39,6 +39,11 @@ PROMPTS = {
 }
 PREAMBLE = re.compile(r"^\s*(вот|конечно|разумеется|хорошо)[^\n]{0,80}:\s*\n", re.I)
 REFUSAL = re.compile(r"^\s*(извините|к сожалению|я не могу|как (языковая )?модель|i'm sorry|i cannot)", re.I)
+LABEL = re.compile(r"^\s*(текст|продолжение|пересказ|упрощ[её]нный текст|ответ)\s*:\s*", re.I)
+
+
+def _norm_words(s: str) -> list[str]:
+    return re.sub(r"[^\w\s]", " ", s.lower()).split()
 
 
 def latin_share(t: str) -> float:
@@ -72,12 +77,19 @@ def clean(raw: str, job) -> str | None:
     t = re.sub(r"\*\*|__|(?<!\w)\*(?!\w)|^#+\s*", "", t, flags=re.M).strip()  # markdown emphasis / headers
     if REFUSAL.match(t) or latin_share(t) > 0.3:  # off-task: refusal or non-Russian output
         return None
+    t = LABEL.sub("", t).strip()
     if job.task == "continue":
-        head_norm = " ".join(job.head.lower().split())
-        if " ".join(t.lower().split()).startswith(head_norm):  # model echoed the whole prompt head
-            t = t[len(job.head):].lstrip(" ,.;:") if t.lower().startswith(job.head.lower()) else t.split(maxsplit=len(job.head.split()))[-1]
-        elif t.split() and t.split()[0].lower().strip(".,;:!?") == job.head.split()[-1].lower().strip(".,;:!?"):
-            t = " ".join(t.split()[1:])  # model echoed the last prompt word
+        head_words = _norm_words(job.head)
+        t_words = t.split()
+        if _norm_words(" ".join(t_words[: len(head_words) + 3]))[: len(head_words)] == head_words:
+            consumed, k = 0, 0  # drop raw tokens until the normalized head is consumed (punctuation-insensitive)
+            while k < len(t_words) and consumed < len(head_words):
+                consumed += len(_norm_words(t_words[k]))
+                k += 1
+            t = " ".join(t_words[k:])
+        elif t_words and _norm_words(t_words[0]) == head_words[-1:]:
+            t = " ".join(t_words[1:])  # model echoed the last prompt word
+        t = LABEL.sub("", t).strip()
         if len(t.split()) < max(8, int(0.4 * (job.words - 10))):
             return None
         t = job.head + " " + t
@@ -136,9 +148,14 @@ class HFBackend:
 
 
 class VLLMBackend:
-    def __init__(self, model, quant, max_new):
+    def __init__(self, model, quant, max_new, gpu_util=0.85, eager=False):
         from vllm import LLM, SamplingParams
-        self.llm = LLM(model=model, dtype="bfloat16", max_model_len=2048, gpu_memory_utilization=0.9)
+        kw = dict(model=model, dtype="bfloat16", max_model_len=1536, gpu_memory_utilization=gpu_util,
+                  max_num_seqs=64, enforce_eager=eager)
+        try:
+            self.llm = LLM(**kw, limit_mm_per_prompt={"image": 0, "video": 0})  # text-only use of multimodal models
+        except (TypeError, ValueError):
+            self.llm = LLM(**kw)
         self.tok = self.llm.get_tokenizer()
         self.SP = SamplingParams
         self.max_new = max_new
@@ -201,6 +218,8 @@ def main():
     ap.add_argument("--min_words", type=int, default=15)
     ap.add_argument("--max_words", type=int, default=200)
     ap.add_argument("--flush", type=int, default=64)
+    ap.add_argument("--gpu_util", type=float, default=0.85, help="vLLM gpu_memory_utilization")
+    ap.add_argument("--eager", action="store_true", help="vLLM enforce_eager (no CUDA graphs; use if graph capture OOMs)")
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -218,7 +237,8 @@ def main():
     if len(todo) == 0:
         return
 
-    backend = (VLLMBackend if args.backend == "vllm" else HFBackend)(args.model, args.quant, 0)
+    backend = (VLLMBackend(args.model, args.quant, 0, args.gpu_util, args.eager) if args.backend == "vllm"
+               else HFBackend(args.model, args.quant, 0))
     rows = [] if len(done) == 0 else done.to_dict("records")
     t0, dropped = time.time(), 0
     for i in range(0, len(todo), args.bs):
