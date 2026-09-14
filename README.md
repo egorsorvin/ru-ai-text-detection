@@ -192,3 +192,8 @@ python scripts/analyze_thresholds.py
 - I. Tolstykh et al. LLMTrace: A Corpus for Classification and Fine-Grained Localization of AI-Written Text. 2025. [arXiv:2509.21269](https://arxiv.org/abs/2509.21269)
 - T. Batura et al. AINL-Eval 2025 Shared Task: Detection of AI-Generated Scientific Abstracts in Russian. 2025. [arXiv:2508.09622](https://arxiv.org/abs/2508.09622)
 - A. Hans et al. Spotting LLMs With Binoculars: Zero-Shot Detection of Machine-Generated Text. *ICML*, 2024. [arXiv:2401.12070](https://arxiv.org/abs/2401.12070)
+
+## License
+
+The code is released under the [MIT License](LICENSE). The corpora and models used here keep their own licenses,
+see the links in the Data section.
