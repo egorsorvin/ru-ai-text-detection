@@ -16,7 +16,7 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-Detectors of machine-generated Russian text are trained on corpora built with 2020--2022 generators, while the
+Detectors of machine-generated Russian text are trained on corpora built with 2020--2021 generators, while the
 texts they meet today come from much newer models. We measure how such detectors transfer across corpora and
 generator eras. Encoders fine-tuned on CoAT, zero-shot Binoculars with Russian-capable model pairs, and encoders
 trained on corpus mixtures are evaluated on CoAT, LLMTrace, AINL-Eval 2025 and two new test sets generated with
@@ -36,8 +36,8 @@ Detectors of AI-generated text are used in education, content moderation and fra
 main public resources come from the RuATD 2022 shared task and its extension CoAT~\cite{shamardina2022ruatd,
 shamardina2025coat}, built with generators such as ruGPT-3 and ruT5. Generators have changed since then: current
 models write fluent text, and a detector that learned the artifacts of older models may miss it. In English,
-detection is known to degrade on unseen generators and domains~\cite{dugan2024raid}, but this has not been
-measured across Russian corpora of different eras.
+detection is known to degrade on unseen generators and domains~\cite{dugan2024raid}; for Russian we found no
+evaluation across corpora of different eras.
 
 We evaluate three kinds of detectors on three public corpora, CoAT, LLMTrace~\cite{tolstykh2025llmtrace} and
 AINL-Eval~\cite{batura2025ainl}, under a leave-one-corpus-out protocol. We also build two test sets that pair
@@ -108,6 +108,11 @@ LLMTrace, Russian & Fine-tuned Mistral-7B & AI-class F1 & 0.986 \\
 
 
 \section{Model Description}
+\paragraph{Task.} Given a Russian text $s$, a detector outputs a score $f(s)$; a higher score means the text is
+more likely machine-generated. Detectors are trained on the training split of one or more corpora and evaluated
+on the test split of every corpus. The question is how well $f$ separates human and machine texts on corpora and
+generators that were not used for training.
+
 We compare three detectors.
 
 \paragraph{Fine-tuned encoder.} The \texttt{[CLS]} vector $h$ of a pretrained encoder (ruBERT-base or
@@ -120,7 +125,7 @@ $$\ell_P(s) = -\frac{1}{L}\sum_{i} \log p_P(x_i \mid x_{<i}), \qquad
 \ell_X(s) = -\frac{1}{L}\sum_{i} \sum_{v} p_O(v \mid x_{<i}) \log p_P(v \mid x_{<i}),$$
 $$B(s) = \ell_P(s) / \ell_X(s).$$
 $\ell_P$ is the log-perplexity of the text, $\ell_X$ the expected log-perplexity of a typical text in the same
-contexts. A low $B$ indicates machine text. Nothing is trained. We use three pairs: Qwen3-4B, YandexGPT-5-Lite-8B
+contexts. A low $B$ indicates machine text, so the detector score is $f(s) = -B(s)$. Nothing is trained. We use three pairs: Qwen3-4B, YandexGPT-5-Lite-8B
 and Qwen3-14B.
 
 \paragraph{Encoder with Binoculars features.} The vector $z = (B, \log\ell_P, \log\ell_X)$ from the Qwen3-14B
@@ -188,7 +193,8 @@ where $t_{0.95}$ is the 95th percentile of the scores $f$ of human test texts.
 Encoders are trained for 2 epochs with AdamW, weight decay 0.01, linear warmup over 6\% of steps, gradient
 clipping at 1.0, bf16 and at most 256 tokens. The checkpoint with the best dev accuracy is evaluated once on
 every test set. ruBERT-base uses batch 32 and learning rate $2\cdot10^{-5}$; ruRoBERTa-large uses batch 16 and
-$10^{-5}$. Binoculars uses bf16 and at most 256 tokens; its accuracy threshold is fitted on CoAT dev. All results
+$10^{-5}$. For corpus mixtures the dev set holds 1,500 balanced texts per training corpus and is evaluated every
+300 steps. Trained detectors predict the class with the higher logit. Binoculars uses bf16 and at most 256 tokens; its accuracy threshold is fitted on CoAT dev. All results
 come from one run with seed 42. CoAT baselines were trained on an RTX 3060, the rest on one rented H100 80GB in
 about 3.5 hours of instance time. Code and exact commands are in the repository.
 
@@ -259,7 +265,8 @@ training. The generated sets are unseen by all detectors.}
     the same pattern (0.40--0.44 overall). ruGPT-3 texts are about twice as long as the human texts, so length
     does not explain the inversion.
     \item \textbf{Mixtures.} Adding LLMTrace to CoAT raises AUROC on AINL from 0.64 to 0.91; adding AINL raises
-    LLMTrace from 0.52 to 0.67. Mixtures with LLMTrace reach 0.79--0.82 on our sets. LLMTrace training data
+    LLMTrace from 0.52 to 0.67. Mixtures with LLMTrace give the best AUROC on our sets, 0.82 on Qwen3.8 and 0.81
+on T-pro, against at most 0.62 for CoAT-trained encoders and 0.70 for Binoculars. LLMTrace training data
     contains the GPT-4 family (37\% of its machine texts), Llama-3.3, Gemma-2 and Qwen models, which also produced
     AINL and our sets, so these gains may come from covering the test generator families.
     \item \textbf{Binoculars features} change AUROC by $-0.03$ to $+0.03$, within run-to-run noise.
@@ -321,9 +328,10 @@ Text & CoAT & All \\
 
 \section{Conclusion}
 We evaluated Russian AI-text detectors across three public corpora and two test sets generated with 2026 models.
-Detectors trained on 2020--2021 generators lose most of their signal on modern text, and detectors trained on
-modern text are inverted on the old corpus. Binoculars with Russian-capable pairs separates free continuations
-(up to 0.84 AUROC) but not paraphrases, and its features do not help a fine-tuned encoder. Training on corpus
+Detectors trained on 2020--2021 generators reach 0.43--0.71 AUROC on newer corpora and 0.55--0.62 on our sets,
+and detectors trained on modern corpora score the old corpus below chance, 0.46--0.48. Binoculars with
+Russian-capable pairs separates free continuations with up to 0.84 AUROC and paraphrases with at most 0.64, and
+its features change the AUROC of a fine-tuned encoder by at most 0.03. Training on corpus
 mixtures gives the best results on our test sets, 0.79--0.82 AUROC, but the corpora share generator families, and
 at a 5\% false positive rate the best models catch under 45\% of machine texts from the new generators. Open
 questions are a split that holds out whole generator families, several seeds, and generators outside the Qwen
