@@ -49,10 +49,15 @@ def load_llmtrace_ru(force: bool = False) -> pd.DataFrame:
     return df
 
 
+def _drop_empty(df: pd.DataFrame) -> pd.DataFrame:
+    ok = df.text.map(lambda x: isinstance(x, str) and x.strip() != "")
+    return df[ok].reset_index(drop=True)
+
+
 def load_ainl(force: bool = False) -> pd.DataFrame:
     cache = DATA_DIR / "ainl.parquet"
     if cache.exists() and not force:
-        return pd.read_parquet(cache)
+        return _drop_empty(pd.read_parquet(cache))  # AINL train contains one empty text
     from huggingface_hub import snapshot_download
 
     snap = snapshot_download("iis-research-team/AINL-Eval-2025", repo_type="dataset")
@@ -73,7 +78,7 @@ def load_ainl(force: bool = False) -> pd.DataFrame:
     df["corpus"] = "ainl"
     DATA_DIR.mkdir(exist_ok=True)
     df.to_parquet(cache, index=False)
-    return df
+    return _drop_empty(df)
 
 
 if __name__ == "__main__":
