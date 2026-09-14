@@ -106,11 +106,13 @@ def clean(raw: str, job) -> str | None:
     words = t.split()
     if len(words) < 5 or t.strip().lower() == job.source_text.strip().lower():
         return None
-    if repetition_loop(t) or META.search(t):  # degenerate output or the model talking about the task
+    if META.search(t):  # the model talking about the task instead of doing it
         return None
     cap = int(job.words * 1.2) + 5  # keep generated length close to the human source (drop whole sentences)
     if len(words) > cap:
         t = trim_to_sentence(t, max_words=cap, min_keep=int(0.6 * cap))
+    if repetition_loop(t):  # checked after trimming: repetition matters relative to the final length
+        return None
     return t
 
 
