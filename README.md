@@ -18,7 +18,7 @@ model trained on corpus mixes are compared under a leave-one-corpus-out protocol
 | `scripts/binoculars.py`, `scripts/score_binoculars.py` | Zero-shot Binoculars with a base/instruct pair; cached per-text features |
 | `scripts/train_mix.py` | Encoder (+ Binoculars features) trained on corpus mixes |
 | `scripts/generate_set.py` | Held-out test set from unseen generators (continue / paraphrase / simplify) |
-| `run_all.sh`, `docs/vast_ai.md` | Full pipeline for one 80 GB GPU and how to run it on a rented instance |
+| `run_all.sh` | Full pipeline for one 80 GB GPU (generation, Binoculars features, mixed training) |
 | `outputs/results/*.json` | Metrics of every run (accuracy, macro-F1, AUROC, per-generator accuracy) |
 
 ## Setup
