@@ -62,7 +62,49 @@ Our contributions are:
 
 \section{Related Work}
 \label{sec:related}
-% TODO
+
+\paragraph{Russian corpora.} RuATD 2022~\cite{shamardina2022ruatd} and its extension
+CoAT~\cite{shamardina2025coat} contain texts from 13 generators of 2020--2021 fine-tuned for translation,
+paraphrasing, summarization and simplification, plus free generation. LLMTrace~\cite{tolstykh2025llmtrace}
+covers generators of 2023--2025, including the GPT-4 family, GigaChat, YandexGPT and Qwen.
+AINL-Eval 2025~\cite{batura2025ainl} contains scientific abstracts by GPT-4-Turbo, Gemma-2-27B, Llama-3.3-70B and
+withheld models. Each work evaluates detectors within its own corpus.
+
+\paragraph{Generalization.} M4~\cite{wang2024m4}, MULTITuDE~\cite{macko2023multitude} and
+RAID~\cite{dugan2024raid} show that trained detectors lose accuracy on unseen generators and domains.
+Kirichenko~\cite{kirichenko2026sameorigin} shows that on Russian data detector scores also follow the text
+source, so cross-corpus results mix a generator shift with a source shift.
+
+\paragraph{Zero-shot detection.} DetectGPT~\cite{mitchell2023detectgpt}, Fast-DetectGPT~\cite{bao2024fastdetectgpt}
+and Binoculars~\cite{hans2024binoculars} use the probabilities of a language model instead of training.
+Binoculars detects over 90\% of ChatGPT texts at a 0.01\% false-positive rate in English, but LLMTrace reports an
+AI-class F1 of 0.02 on Russian. Paraphrasing evades such detectors~\cite{krishna2023paraphrasing}.
+
+Published results are in Table~\ref{tab:prior}. They are not directly comparable with ours: the official CoAT and
+AINL-Eval test labels are closed.
+
+\begin{table}[tbh!]
+\begin{center}
+\begin{tabular}{|l|l|l|c|}
+\hline
+Work & Detector & Metric & Value \\
+\hline
+RuATD 2022, binary & TF-IDF + logistic regression & Accuracy & 0.642 \\
+ & BERT baseline & Accuracy & 0.797 \\
+ & Best system, fine-tuned encoders & Accuracy & 0.830 \\
+ & Human annotators & Accuracy & 0.667 \\
+\hline
+CoAT, binary & ruRoBERTa-large & Accuracy & 0.864 \\
+ & Human annotators & Accuracy & 0.66 \\
+\hline
+LLMTrace, Russian & Fine-tuned Mistral-7B & AI-class F1 & 0.986 \\
+ & Binoculars, zero-shot & AI-class F1 & 0.02 \\
+\hline
+\end{tabular}
+\caption{Published results on the corpora used in this work, as reported by their authors.}
+\label{tab:prior}
+\end{center}
+\end{table}
 
 
 \section{Model Description}
