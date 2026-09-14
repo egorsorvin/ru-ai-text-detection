@@ -41,6 +41,24 @@ def save_result(name: str, split: str, m: dict, extra: dict | None = None) -> Pa
     return path
 
 
+PREDS_DIR = ROOT / "outputs" / "preds"
+
+
+def save_preds(name: str, split: str, df: pd.DataFrame, y_pred, y_score=None) -> Path:
+    """Per-text predictions for later slicing (by task, length, generator)."""
+    PREDS_DIR.mkdir(parents=True, exist_ok=True)
+    out = pd.DataFrame({"id": df["id"].values, "label": df["label"].values, "pred": np.asarray(y_pred)})
+    if y_score is not None:
+        out["score"] = np.asarray(y_score)
+    for col in ("generator", "task", "domain"):
+        if col in df.columns:
+            out[col] = df[col].values
+    out["words"] = df["text"].str.split().str.len().values
+    path = PREDS_DIR / f"{name}__{split}.parquet"
+    out.to_parquet(path, index=False)
+    return path
+
+
 def report(name: str, split: str, df: pd.DataFrame, y_pred, y_score=None, save=True) -> dict:
     m = metrics(df["label"].values, y_pred, y_score)
     print(f"[{name}] {split}: " + ", ".join(f"{k}={v:.4f}" for k, v in m.items()))
@@ -48,4 +66,5 @@ def report(name: str, split: str, df: pd.DataFrame, y_pred, y_score=None, save=T
     print(pg.to_string(float_format=lambda x: f"{x:.3f}"))
     if save:
         save_result(name, split, m, {"per_generator": pg["acc"].round(4).to_dict()})
+        save_preds(name, split, df, y_pred, y_score)
     return m
