@@ -96,17 +96,19 @@ def clean(raw: str, job) -> str | None:
     words = t.split()
     if len(words) < 5 or t.strip() == job.source_text.strip():
         return None
-    cap = int(job.words * 1.5) + 10
+    cap = int(job.words * 1.2) + 5  # keep generated length close to the human source (drop whole sentences)
     if len(words) > cap:
-        t = trim_to_sentence(" ".join(words[:cap]), min_keep=int(0.6 * cap))
+        t = trim_to_sentence(t, max_words=cap, min_keep=int(0.6 * cap))
     return t
 
 
-def trim_to_sentence(t: str, min_keep: int) -> str:
-    """Cut a truncated text back to its last sentence end, if that keeps at least `min_keep` words."""
+def trim_to_sentence(t: str, max_words: int, min_keep: int) -> str:
+    """Drop trailing sentences so that the text has <= max_words words, keeping >= min_keep.
+    If no sentence boundary satisfies both, return the text untrimmed (never cut mid-sentence)."""
     ends = [m.end() for m in re.finditer(r"[.!?…»\"]+(?=\s|$)", t)]
     for e in reversed(ends):
-        if len(t[:e].split()) >= min_keep:
+        n = len(t[:e].split())
+        if min_keep <= n <= max_words:
             return t[:e].strip()
     return t
 
