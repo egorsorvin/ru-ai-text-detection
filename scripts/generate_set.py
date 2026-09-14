@@ -51,6 +51,16 @@ def latin_share(t: str) -> float:
     return sum(c.isascii() for c in letters) / max(1, len(letters))
 
 
+META = re.compile(r"(перепиш|перескаж|продолж)[а-я]*\s+(этот|текст)|как\s+(языковая\s+)?модель|исходн[ыоа][йе]\s+текст", re.I)
+
+
+def repetition_loop(t: str, n: int = 4, thr: float = 0.2) -> bool:
+    """True if the text degenerates into repeated n-grams (a known failure mode of open generation)."""
+    w = t.lower().split()
+    grams = [" ".join(w[i:i + n]) for i in range(len(w) - n + 1)]
+    return bool(grams) and (len(grams) - len(set(grams))) / len(grams) > thr
+
+
 def build_jobs(n_per_task: int, min_words: int, max_words: int, seed: int) -> pd.DataFrame:
     _, _, test = get_splits()
     human = test[test.label == 0].copy()
@@ -94,7 +104,9 @@ def clean(raw: str, job) -> str | None:
             return None
         t = job.head + " " + t
     words = t.split()
-    if len(words) < 5 or t.strip() == job.source_text.strip():
+    if len(words) < 5 or t.strip().lower() == job.source_text.strip().lower():
+        return None
+    if repetition_loop(t) or META.search(t):  # degenerate output or the model talking about the task
         return None
     cap = int(job.words * 1.2) + 5  # keep generated length close to the human source (drop whole sentences)
     if len(words) > cap:
