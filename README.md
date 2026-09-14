@@ -13,19 +13,23 @@ mixtures with Binoculars features.
   CoAT and 0.52-0.64 on the newer corpora. On our 2026 sets the human texts are the CoAT ones and only the
   generator changes: AUROC drops to 0.58-0.62, and the model flags 14-17% of machine texts.
 - **The shift is symmetric.** Models trained only on modern corpora are inverted on CoAT (0.46-0.48 AUROC), and
-  so is zero-shot Binoculars (0.40-0.44). Generators of 2020-2021 wrote less fluently than people; current
-  generators write more predictably.
-- **Corpus diversity drives transfer.** Adding LLMTrace (38 generators, 8 domains) to CoAT raises AUROC on the
-  unseen AINL from 0.64 to 0.91 and reaches about 0.80 on the unseen 2026 sets. Adding the narrower AINL helps
-  much less.
+  so is zero-shot Binoculars (0.40-0.44). The inversion is concentrated in free generation by ruGPT models
+  (0.32-0.38 for the trained model) and is not explained by length, since those texts are twice as long as the
+  human ones. Generators of 2020-2021 wrote less fluently than people; current generators write more predictably.
+- **Adding training corpora improves transfer, but generator overlap is a confound.** Adding LLMTrace to CoAT
+  raises AUROC on AINL-Eval from 0.64 to 0.91 and reaches about 0.80 on the 2026 sets. However, 37% of the
+  machine-written LLMTrace training texts come from the GPT-4 family, and it also contains Llama-3.3, Gemma-2 and
+  Qwen models: the families behind AINL-Eval and both 2026 generators. These experiments do not separate corpus
+  diversity from coverage of the test generator families.
 - **Binoculars works on Russian with a Russian-capable pair**, 0.61-0.80 AUROC on modern corpora, but only for
   free continuation. Paraphrase and simplification of human texts stay at 0.51-0.66. Pair size and
   native-Russian pretraining change little. A threshold calibrated on CoAT is useless on newer data, while a
   threshold calibrated on other modern corpora is within 0.04 balanced accuracy of in-domain calibration.
 - **Binoculars features do not improve a multi-corpus encoder**: differences range from -0.03 to +0.03 AUROC
   (single seed).
-- **The practical regime is weak.** At a 5% false-positive rate on human texts, the best models catch 36-44% of
-  machine texts from the unseen 2026 generators.
+- **The practical regime is weak out of distribution.** At a 5% false-positive rate on human texts, the best
+  models catch 36-44% of machine texts from the 2026 generators, while the same models catch 92-96% on the
+  corpora seen in training. Texts are short, about 24 words on median.
 
 ## Results
 
@@ -58,6 +62,9 @@ Leave-one-corpus-out summary, AUROC on the test set that was not used for traini
 | LLMTrace + AINL | CoAT | n/a | 0.46 | 0.48 | 0.43 |
 | all three | Gen: Qwen3.8-27B | 0.62 | 0.79 | 0.80 | 0.68 |
 | all three | Gen: T-pro 2.0 | 0.58 | 0.79 | 0.81 | 0.70 |
+
+An unseen corpus is not necessarily an unseen generator family: LLMTrace shares generator families with
+AINL-Eval and with the 2026 sets, AINL-Eval shares none with the 2026 sets.
 
 On the 2026 test sets by generation task and text length. Each cell shows Qwen3.8 / T-pro.
 
@@ -180,6 +187,8 @@ python scripts/analyze_thresholds.py
 
 - All numbers come from a single training seed. Differences of a few hundredths are within run-to-run noise.
 - Both 2026 generators belong to the Qwen lineage, since T-pro 2.0 is built on Qwen3-32B.
+- The corpora overlap in generator families, so leave-one-corpus-out results measure transfer across corpora,
+  not necessarily across unseen generator families. A family-held-out split is needed to tell them apart.
 - The three corpora differ in human sources and domains, so cross-corpus drops mix a generator shift with a
   domain shift. The generated sets keep CoAT human texts fixed to isolate the generator shift.
 - CoAT and AINL-Eval results use the labelled validation data, not the closed official test sets, so they are
