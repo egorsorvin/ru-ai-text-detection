@@ -1,0 +1,15 @@
+{
+  "model": "mix_coat+ainl_bino",
+  "split": "ainl_test",
+  "time": "2026-09-14T14:26:33",
+  "accuracy": 0.9567316451083986,
+  "f1_macro": 0.9352317182456096,
+  "auroc": 0.991806132255552,
+  "per_generator": {
+    "gpt-4-turbo": 1.0,
+    "gemma-2-27b": 0.9973,
+    "llama-3.3-70b": 0.9995,
+    "Human": 0.9526,
+    "unknown": 0.8325
+  }
+}

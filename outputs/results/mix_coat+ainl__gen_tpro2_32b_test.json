@@ -1,0 +1,12 @@
+{
+  "model": "mix_coat+ainl",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T14:07:22",
+  "accuracy": 0.5319035802906771,
+  "f1_macro": 0.46562456348166753,
+  "auroc": 0.6443032086327741,
+  "per_generator": {
+    "tpro2_32b": 0.1693,
+    "Human": 0.9418
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "ruroberta",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T18:37:25",
+  "accuracy": 0.5299858055358411,
+  "f1_macro": 0.4658457711006688,
+  "auroc": 0.6170609016884157,
+  "per_generator": {
+    "qwen38_27b": 0.1728,
+    "Human": 0.9342
+  }
+}

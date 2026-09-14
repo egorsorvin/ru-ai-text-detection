@@ -1,0 +1,12 @@
+{
+  "model": "tfidf_lr",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T18:35:47",
+  "accuracy": 0.5047855370436015,
+  "f1_macro": 0.4635638902081082,
+  "auroc": 0.5487870252085238,
+  "per_generator": {
+    "tpro2_32b": 0.2144,
+    "Human": 0.8331
+  }
+}

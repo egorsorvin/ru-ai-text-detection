@@ -1,0 +1,24 @@
+{
+  "model": "mix_coat+ainl",
+  "split": "coat_test",
+  "time": "2026-09-14T14:06:56",
+  "accuracy": 0.8423339288614585,
+  "f1_macro": 0.8415106661121377,
+  "auroc": 0.9293080881093916,
+  "per_generator": {
+    "Human": 0.9144,
+    "ruGPT3-Large": 0.8663,
+    "ruGPT3-Small": 0.9694,
+    "ruGPT3-Medium": 0.9506,
+    "M-BART50": 0.6171,
+    "ruT5-Base": 0.8457,
+    "mT5-Small": 0.8171,
+    "ruT5-Base-Multitask": 0.4853,
+    "ruGPT2-Large": 0.7552,
+    "OPUS-MT": 0.514,
+    "M2M-100": 0.3959,
+    "mT5-Large": 0.4949,
+    "ruT5-Large": 0.386,
+    "M-BART": 0.6182
+  }
+}

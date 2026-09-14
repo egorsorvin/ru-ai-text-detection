@@ -1,0 +1,12 @@
+{
+  "model": "binoculars_qwen3_14b_bf16",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T13:50:14",
+  "accuracy": 0.4861751152073733,
+  "f1_macro": 0.35620730255236777,
+  "auroc": 0.6995551399879316,
+  "per_generator": {
+    "tpro2_32b": 0.0347,
+    "Human": 0.9966
+  }
+}

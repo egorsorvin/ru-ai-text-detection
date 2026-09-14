@@ -1,0 +1,12 @@
+{
+  "model": "mix_llmtrace+ainl_bino",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T14:33:23",
+  "accuracy": 0.7152235628105039,
+  "f1_macro": 0.7148462993314739,
+  "auroc": 0.7963620335013388,
+  "per_generator": {
+    "qwen38_27b": 0.6394,
+    "Human": 0.8011
+  }
+}

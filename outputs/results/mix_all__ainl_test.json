@@ -1,0 +1,15 @@
+{
+  "model": "mix_all",
+  "split": "ainl_test",
+  "time": "2026-09-14T14:52:08",
+  "accuracy": 0.9563672800145746,
+  "f1_macro": 0.9338495491754759,
+  "auroc": 0.9900360514816509,
+  "per_generator": {
+    "gpt-4-turbo": 1.0,
+    "gemma-2-27b": 0.9973,
+    "llama-3.3-70b": 0.9991,
+    "Human": 0.9334,
+    "unknown": 0.8504
+  }
+}

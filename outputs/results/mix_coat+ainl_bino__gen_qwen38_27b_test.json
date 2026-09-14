@@ -1,0 +1,12 @@
+{
+  "model": "mix_coat+ainl_bino",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T14:26:37",
+  "accuracy": 0.5571327182398864,
+  "f1_macro": 0.5063293911151014,
+  "auroc": 0.6889085089234428,
+  "per_generator": {
+    "qwen38_27b": 0.2226,
+    "Human": 0.9357
+  }
+}

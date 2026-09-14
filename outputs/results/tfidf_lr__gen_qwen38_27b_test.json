@@ -1,0 +1,12 @@
+{
+  "model": "tfidf_lr",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T18:35:42",
+  "accuracy": 0.5140170333569908,
+  "f1_macro": 0.4765954620360245,
+  "auroc": 0.5660826753339212,
+  "per_generator": {
+    "qwen38_27b": 0.2323,
+    "Human": 0.8328
+  }
+}

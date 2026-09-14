@@ -1,0 +1,24 @@
+{
+  "model": "binoculars_qwen3_14b_bf16",
+  "split": "coat_test",
+  "time": "2026-09-14T13:50:13",
+  "accuracy": 0.5011775215202209,
+  "f1_macro": 0.3428353198939319,
+  "auroc": 0.42706439169066673,
+  "per_generator": {
+    "Human": 0.992,
+    "ruGPT3-Large": 0.0067,
+    "ruGPT3-Small": 0.0026,
+    "ruGPT3-Medium": 0.0027,
+    "M-BART50": 0.0432,
+    "ruT5-Base": 0.0042,
+    "mT5-Small": 0.0034,
+    "ruT5-Base-Multitask": 0.0052,
+    "ruGPT2-Large": 0.0017,
+    "OPUS-MT": 0.0223,
+    "M2M-100": 0.0375,
+    "mT5-Large": 0.0061,
+    "ruT5-Large": 0.0044,
+    "M-BART": 0.0135
+  }
+}

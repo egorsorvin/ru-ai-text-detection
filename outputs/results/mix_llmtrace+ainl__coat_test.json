@@ -1,0 +1,24 @@
+{
+  "model": "mix_llmtrace+ainl",
+  "split": "coat_test",
+  "time": "2026-09-14T14:13:27",
+  "accuracy": 0.4880217638460289,
+  "f1_macro": 0.445917323446017,
+  "auroc": 0.4579027400844594,
+  "per_generator": {
+    "Human": 0.7637,
+    "ruGPT3-Large": 0.0856,
+    "ruGPT3-Small": 0.149,
+    "ruGPT3-Medium": 0.1356,
+    "M-BART50": 0.3976,
+    "ruT5-Base": 0.3107,
+    "mT5-Small": 0.1248,
+    "ruT5-Base-Multitask": 0.2149,
+    "ruGPT2-Large": 0.1007,
+    "OPUS-MT": 0.4786,
+    "M2M-100": 0.4747,
+    "mT5-Large": 0.2495,
+    "ruT5-Large": 0.2632,
+    "M-BART": 0.3682
+  }
+}

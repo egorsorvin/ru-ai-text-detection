@@ -1,0 +1,24 @@
+{
+  "model": "binoculars_yagpt5_8b_bf16",
+  "split": "coat_test",
+  "time": "2026-09-14T13:50:53",
+  "accuracy": 0.4998781874289427,
+  "f1_macro": 0.34597213941579114,
+  "auroc": 0.4009980512626551,
+  "per_generator": {
+    "Human": 0.985,
+    "ruGPT3-Large": 0.0186,
+    "ruGPT3-Small": 0.0069,
+    "ruGPT3-Medium": 0.0096,
+    "M-BART50": 0.0406,
+    "ruT5-Base": 0.0042,
+    "mT5-Small": 0.0017,
+    "ruT5-Base-Multitask": 0.0087,
+    "ruGPT2-Large": 0.0035,
+    "OPUS-MT": 0.0242,
+    "M2M-100": 0.045,
+    "mT5-Large": 0.0061,
+    "ruT5-Large": 0.0066,
+    "M-BART": 0.0169
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "model": "mix_coat+llmtrace",
+  "split": "ainl_test",
+  "time": "2026-09-14T14:01:34",
+  "accuracy": 0.8802149754053562,
+  "f1_macro": 0.7942919249897606,
+  "auroc": 0.9065240957867442,
+  "per_generator": {
+    "gpt-4-turbo": 0.9932,
+    "gemma-2-27b": 0.9165,
+    "llama-3.3-70b": 0.9641,
+    "Human": 0.5855,
+    "unknown": 0.9411
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "rubert",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T18:36:28",
+  "accuracy": 0.5427153491669621,
+  "f1_macro": 0.48775981751806835,
+  "auroc": 0.6019639354237175,
+  "per_generator": {
+    "tpro2_32b": 0.2027,
+    "Human": 0.9271
+  }
+}

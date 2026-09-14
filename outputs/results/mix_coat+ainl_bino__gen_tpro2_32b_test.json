@@ -1,0 +1,12 @@
+{
+  "model": "mix_coat+ainl_bino",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T14:26:41",
+  "accuracy": 0.5446650124069479,
+  "f1_macro": 0.487315783320915,
+  "auroc": 0.6750274844754969,
+  "per_generator": {
+    "tpro2_32b": 0.1981,
+    "Human": 0.9366
+  }
+}

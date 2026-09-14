@@ -1,0 +1,15 @@
+{
+  "model": "binoculars_yagpt5_8b_bf16",
+  "split": "ainl_test",
+  "time": "2026-09-14T13:50:53",
+  "accuracy": 0.34787757332847513,
+  "f1_macro": 0.3462425842188205,
+  "auroc": 0.8041979434227132,
+  "per_generator": {
+    "gpt-4-turbo": 0.0454,
+    "gemma-2-27b": 0.4623,
+    "llama-3.3-70b": 0.1462,
+    "Human": 0.9959,
+    "unknown": 0.0893
+  }
+}

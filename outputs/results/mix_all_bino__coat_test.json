@@ -1,0 +1,24 @@
+{
+  "model": "mix_all_bino",
+  "split": "coat_test",
+  "time": "2026-09-14T14:42:16",
+  "accuracy": 0.8357966542147149,
+  "f1_macro": 0.8351982822380595,
+  "auroc": 0.9206664882729007,
+  "per_generator": {
+    "Human": 0.8961,
+    "ruGPT3-Large": 0.8596,
+    "ruGPT3-Small": 0.9694,
+    "ruGPT3-Medium": 0.95,
+    "M-BART50": 0.6379,
+    "ruT5-Base": 0.8509,
+    "mT5-Small": 0.8308,
+    "ruT5-Base-Multitask": 0.4627,
+    "ruGPT2-Large": 0.7448,
+    "OPUS-MT": 0.5642,
+    "M2M-100": 0.4221,
+    "mT5-Large": 0.499,
+    "ruT5-Large": 0.3947,
+    "M-BART": 0.6757
+  }
+}

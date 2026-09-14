@@ -1,0 +1,12 @@
+{
+  "model": "rubert",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T18:36:16",
+  "accuracy": 0.5367281760113556,
+  "f1_macro": 0.47907312826767484,
+  "auroc": 0.5990787586868057,
+  "per_generator": {
+    "qwen38_27b": 0.1922,
+    "Human": 0.9266
+  }
+}

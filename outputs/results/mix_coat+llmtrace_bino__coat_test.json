@@ -1,0 +1,24 @@
+{
+  "model": "mix_coat+llmtrace_bino",
+  "split": "coat_test",
+  "time": "2026-09-14T14:20:01",
+  "accuracy": 0.8370959883059932,
+  "f1_macro": 0.8368027264313014,
+  "auroc": 0.9223094675571266,
+  "per_generator": {
+    "Human": 0.8795,
+    "ruGPT3-Large": 0.873,
+    "ruGPT3-Small": 0.9736,
+    "ruGPT3-Medium": 0.9506,
+    "M-BART50": 0.6793,
+    "ruT5-Base": 0.8634,
+    "mT5-Small": 0.8188,
+    "ruT5-Base-Multitask": 0.4749,
+    "ruGPT2-Large": 0.7639,
+    "OPUS-MT": 0.5922,
+    "M2M-100": 0.4878,
+    "mT5-Large": 0.5558,
+    "ruT5-Large": 0.4539,
+    "M-BART": 0.7399
+  }
+}

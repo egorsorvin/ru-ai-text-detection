@@ -1,0 +1,12 @@
+{
+  "model": "ruroberta",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T18:37:59",
+  "accuracy": 0.510989010989011,
+  "f1_macro": 0.43517918843382586,
+  "auroc": 0.5793165510275333,
+  "per_generator": {
+    "tpro2_32b": 0.1363,
+    "Human": 0.9347
+  }
+}

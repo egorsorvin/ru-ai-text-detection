@@ -1,0 +1,12 @@
+{
+  "model": "binoculars_yagpt5_8b_bf16",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T13:50:53",
+  "accuracy": 0.4838709677419355,
+  "f1_macro": 0.35827634462545876,
+  "auroc": 0.5973781021257014,
+  "per_generator": {
+    "tpro2_32b": 0.0391,
+    "Human": 0.9868
+  }
+}

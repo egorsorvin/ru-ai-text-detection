@@ -1,0 +1,12 @@
+{
+  "model": "mix_llmtrace+ainl",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T14:14:01",
+  "accuracy": 0.7323644097837646,
+  "f1_macro": 0.7322769073740736,
+  "auroc": 0.8119041456528364,
+  "per_generator": {
+    "tpro2_32b": 0.7071,
+    "Human": 0.761
+  }
+}

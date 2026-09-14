@@ -1,0 +1,12 @@
+{
+  "model": "mix_coat+llmtrace",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T14:01:42",
+  "accuracy": 0.6745834810350939,
+  "f1_macro": 0.6650469218964323,
+  "auroc": 0.7966380268089049,
+  "per_generator": {
+    "tpro2_32b": 0.4766,
+    "Human": 0.8984
+  }
+}

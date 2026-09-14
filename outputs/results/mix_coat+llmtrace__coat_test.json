@@ -1,0 +1,24 @@
+{
+  "model": "mix_coat+llmtrace",
+  "split": "coat_test",
+  "time": "2026-09-14T14:01:16",
+  "accuracy": 0.8296248172811435,
+  "f1_macro": 0.8292301270565507,
+  "auroc": 0.9190276769029674,
+  "per_generator": {
+    "Human": 0.8777,
+    "ruGPT3-Large": 0.8663,
+    "ruGPT3-Small": 0.9694,
+    "ruGPT3-Medium": 0.9415,
+    "M-BART50": 0.6569,
+    "ruT5-Base": 0.8457,
+    "mT5-Small": 0.8034,
+    "ruT5-Base-Multitask": 0.4922,
+    "ruGPT2-Large": 0.7448,
+    "OPUS-MT": 0.5829,
+    "M2M-100": 0.4447,
+    "mT5-Large": 0.5152,
+    "ruT5-Large": 0.4496,
+    "M-BART": 0.6791
+  }
+}

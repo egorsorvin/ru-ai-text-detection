@@ -1,0 +1,12 @@
+{
+  "model": "mix_all_bino",
+  "split": "gen_tpro2_32b_test",
+  "time": "2026-09-14T14:42:43",
+  "accuracy": 0.6825593761077632,
+  "f1_macro": 0.6721570167469558,
+  "auroc": 0.8130141198812529,
+  "per_generator": {
+    "tpro2_32b": 0.4753,
+    "Human": 0.9169
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "model": "mix_all",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T14:52:12",
+  "accuracy": 0.671930447125621,
+  "f1_macro": 0.6605718899722766,
+  "auroc": 0.7928211994466332,
+  "per_generator": {
+    "qwen38_27b": 0.4606,
+    "Human": 0.9111
+  }
+}

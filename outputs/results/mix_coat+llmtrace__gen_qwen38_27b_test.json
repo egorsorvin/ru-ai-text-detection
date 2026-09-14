@@ -1,0 +1,12 @@
+{
+  "model": "mix_coat+llmtrace",
+  "split": "gen_qwen38_27b_test",
+  "time": "2026-09-14T14:01:39",
+  "accuracy": 0.6965933286018453,
+  "f1_macro": 0.6899990903480004,
+  "auroc": 0.8114744462287735,
+  "per_generator": {
+    "qwen38_27b": 0.5187,
+    "Human": 0.8979
+  }
+}
