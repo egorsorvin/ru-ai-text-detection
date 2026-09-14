@@ -8,6 +8,8 @@
 # Stages: setup -> data -> generate -> features -> zero-shot eval -> mixed training
 set -euo pipefail
 cd "$(dirname "$0")"
+[ -f /venv/main/bin/activate ] && source /venv/main/bin/activate   # vast.ai PyTorch image
+PIP="pip"; command -v uv >/dev/null 2>&1 && PIP="uv pip"
 export HF_HOME="${HF_HOME:-$HOME/hf_cache}"
 export HF_HUB_ENABLE_HF_TRANSFER=1
 export TOKENIZERS_PARALLELISM=false
@@ -24,9 +26,8 @@ stage() { echo; echo "===== [$(date +%H:%M:%S)] $1"; }
 
 stage "setup"
 if [ ! -f outputs/.setup_done ]; then
-  pip install -q -U pip
-  pip install -q "vllm>=0.10" hf_transfer
-  pip install -q transformers datasets scikit-learn pandas pyarrow accelerate joblib
+  $PIP install -q "vllm>=0.10" hf_transfer
+  $PIP install -q -U transformers datasets scikit-learn pandas pyarrow accelerate joblib
   touch outputs/.setup_done
 fi
 $PY -c "import torch;print('torch',torch.__version__,'cuda',torch.cuda.is_available(),torch.cuda.get_device_name(0))"
