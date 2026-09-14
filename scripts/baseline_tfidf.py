@@ -9,7 +9,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import joblib
-import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
@@ -38,7 +37,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     joblib.dump(pipe, out / "tfidf_lr.joblib")
 
-    for name, df in [("dev", dev), ("test", test)]:
+    for name, df in [("coat_dev", dev), ("coat_test", test)]:
         score = pipe.predict_proba(df.text)[:, 1]
         report("tfidf_lr", name, df, (score >= 0.5).astype(int), score)
 

@@ -1,35 +1,47 @@
-"""Compute and cache Binoculars features (score, log-PPL, log-X-PPL) for any corpus split.
+"""Compute and cache Binoculars features (score, perplexity, cross-perplexity) for any corpus split.
+
+Binoculars (Hans et al., 2024): score = PPL_performer(text) / X-PPL(observer, performer)(text).
+A lower score means the text is more likely machine-generated. The observer is the base model and the
+performer the instruct model of the same family, so both share one tokenizer.
 
 Cache: outputs/scores/<tag>_<quant>/<corpus>__<split>.parquet with columns id, score, ppl, xppl.
 Re-running only scores ids that are not cached yet.
 
-Usage:
-    python scripts/score_binoculars.py --corpus coat --split train --cap 10000
+Usage (defaults = the main pair used in the reported results, needs ~60 GB of GPU memory):
     python scripts/score_binoculars.py --corpus llmtrace --split test
+    python scripts/score_binoculars.py --corpus coat --split train --cap 16000
+    python scripts/score_binoculars.py --corpus coat --split test --observer Qwen/Qwen3-4B-Base \
+        --performer Qwen/Qwen3-4B --tag qwen3_4b --quant nf4 --bs 16      # fits a 12 GB GPU
 """
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
 
-os.environ.setdefault("HF_HOME", r"E:\hf_cache")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
-from scripts.binoculars import load_model
 from src.corpora import balance, load_corpus
-from transformers import AutoTokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def load_model(name: str, quant: str, device):
+    if quant == "nf4":
+        cfg = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type="nf4",
+                                 bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True)
+        return AutoModelForCausalLM.from_pretrained(name, quantization_config=cfg, device_map={"": 0})
+    return AutoModelForCausalLM.from_pretrained(name, dtype=torch.bfloat16).to(device)
+
+
 @torch.no_grad()
 def binoculars_features(texts, tok, observer, performer, max_len, bs, device):
+    """Per-text (score, ppl, xppl), processed in length-sorted batches; returned in the original order."""
     texts = list(texts)
     order = np.argsort([len(t) for t in texts])
     out = np.empty((len(texts), 3), dtype=np.float32)
@@ -67,17 +79,17 @@ def main():
     ap.add_argument("--corpus", required=True, help="coat | llmtrace | ainl | gen_<tag>")
     ap.add_argument("--split", required=True, choices=["train", "dev", "test"])
     ap.add_argument("--cap", type=int, default=0, help="score at most N (balanced) texts of this split")
-    ap.add_argument("--observer", default="Qwen/Qwen3-4B-Base")
-    ap.add_argument("--performer", default="Qwen/Qwen3-4B")
-    ap.add_argument("--quant", choices=["nf4", "bf16"], default="nf4")
-    ap.add_argument("--tag", default="qwen3_4b")
+    ap.add_argument("--observer", default="Qwen/Qwen3-14B-Base")
+    ap.add_argument("--performer", default="Qwen/Qwen3-14B")
+    ap.add_argument("--quant", choices=["nf4", "bf16"], default="bf16")
+    ap.add_argument("--tag", default="qwen3_14b")
     ap.add_argument("--max_len", type=int, default=256)
-    ap.add_argument("--bs", type=int, default=16)
+    ap.add_argument("--bs", type=int, default=32)
     args = ap.parse_args()
 
     df = load_corpus(args.corpus).query("split == @args.split").reset_index(drop=True)
     if args.cap and len(df) > args.cap:
-        # train/dev: same rows as src.corpora.train_mix / dev_mix; test: same rows as train_mix --test_cap
+        # train/dev: same rows as src.corpora.train_mix / dev_mix
         df = balance(df).head(args.cap) if args.split in ("train", "dev") else df.sample(args.cap, random_state=0)
     path = cache_path(args.tag, args.quant, args.corpus, args.split)
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -3,19 +3,17 @@
 Our method = pretrained encoder + Binoculars features (score, log PPL, log X-PPL) concatenated
 to the [CLS] vector before the classification head, trained on a mix of corpora.
 
-Usage:
-    python scripts/train_mix.py --train coat,llmtrace --run mix_rubert_coat+llmtrace
-    python scripts/train_mix.py --train coat,llmtrace --bino --run mix_rubert_coat+llmtrace_bino
-Evaluation always runs on the test split of every corpus (seen and unseen).
+Usage (defaults reproduce the reported runs):
+    python scripts/train_mix.py --train coat,llmtrace --run mix_coat+llmtrace
+    python scripts/train_mix.py --train coat,llmtrace --bino --run mix_coat+llmtrace_bino
+Evaluation runs on the test split of every corpus and of every generated set in data/gen.
 """
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
 from types import SimpleNamespace
 
-os.environ.setdefault("HF_HOME", r"E:\hf_cache")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
@@ -27,7 +25,7 @@ from transformers import AutoModel, AutoTokenizer, get_linear_schedule_with_warm
 
 from scripts.score_binoculars import load_features
 from scripts.train_encoder import predict, train_step
-from src.corpora import CORPORA, dev_mix, test_sets, train_mix
+from src.corpora import dev_mix, test_sets, train_mix
 from src.evaluate import report
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -100,16 +98,16 @@ def attach_feats(df: pd.DataFrame, tag: str, quant: str, allow_partial: bool) ->
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="ai-forever/ruBert-base")
+    ap.add_argument("--model", default="ai-forever/ruRoberta-large")
     ap.add_argument("--run", required=True)
     ap.add_argument("--train", required=True, help="comma-separated corpora, e.g. coat,llmtrace")
-    ap.add_argument("--cap", type=int, default=10000, help="balanced rows per corpus in the train mix")
+    ap.add_argument("--cap", type=int, default=16000, help="balanced rows per corpus in the train mix")
     ap.add_argument("--bino", action="store_true", help="add Binoculars features")
-    ap.add_argument("--bino_tag", default="qwen3_4b")
-    ap.add_argument("--bino_quant", default="nf4")
+    ap.add_argument("--bino_tag", default="qwen3_14b")
+    ap.add_argument("--bino_quant", default="bf16")
     ap.add_argument("--max_len", type=int, default=256)
-    ap.add_argument("--bs", type=int, default=32)
-    ap.add_argument("--lr", type=float, default=2e-5)
+    ap.add_argument("--bs", type=int, default=16)
+    ap.add_argument("--lr", type=float, default=1e-5)
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--eval_every", type=int, default=300)
     ap.add_argument("--test_cap", type=int, default=0, help="smoke test: evaluate on at most N texts per test set")

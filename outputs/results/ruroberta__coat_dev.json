@@ -1,6 +1,6 @@
 {
   "model": "ruroberta",
-  "split": "dev",
+  "split": "coat_dev",
   "time": "2026-09-12T19:43:56",
   "accuracy": 0.8807424593967518,
   "f1_macro": 0.8806091866481305,

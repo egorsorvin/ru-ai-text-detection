@@ -13,13 +13,9 @@ into a single frame with columns: id, text, label (0 human / 1 machine), generat
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pandas as pd
-
-os.environ.setdefault("HF_HOME", r"E:\hf_cache")
-os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"

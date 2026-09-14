@@ -6,13 +6,10 @@ Usage:
     python scripts/train_encoder.py --limit 2000 --eval_every 20 --epochs 1   # smoke test
 """
 import argparse
-import os
 import sys
 import time
 from pathlib import Path
 
-os.environ.setdefault("HF_HOME", r"E:\hf_cache")
-os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
@@ -132,14 +129,14 @@ def main():
                       f"lr {scheduler.get_last_lr()[0]:.2e} {time.time()-t0:.0f}s", flush=True)
             if step % args.eval_every == 0 or step == total_steps:
                 pred, prob = predict(model, dev_loader, device)
-                acc = report(args.run, "dev", dev_df, pred, prob, save=False)["accuracy"]
+                acc = report(args.run, "coat_dev", dev_df, pred, prob, save=False)["accuracy"]
                 if acc > best_acc:
                     best_acc = acc
                     torch.save(model.state_dict(), out_dir / "best.pt")
                 print(f"== step {step} dev acc {acc:.4f} (best {best_acc:.4f})", flush=True)
 
     model.load_state_dict(torch.load(out_dir / "best.pt", map_location=device))
-    for name, df, loader in [("dev", dev_df, dev_loader), ("test", test_df, test_loader)]:
+    for name, df, loader in [("coat_dev", dev_df, dev_loader), ("coat_test", test_df, test_loader)]:
         pred, prob = predict(model, loader, device)
         report(args.run, name, df, pred, prob, save=not args.limit)
     print(f"done in {(time.time()-t0)/60:.1f} min", flush=True)

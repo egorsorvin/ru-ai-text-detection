@@ -1,6 +1,6 @@
 {
   "model": "tfidf_lr",
-  "split": "dev",
+  "split": "coat_dev",
   "time": "2026-09-12T22:21:29",
   "accuracy": 0.7627610208816705,
   "f1_macro": 0.7626228071706309,

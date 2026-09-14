@@ -14,13 +14,11 @@ Usage:
     python scripts/generate_set.py --model Qwen/Qwen3.8-27B --tag qwen38_27b --n 1000 --backend vllm
 """
 import argparse
-import os
 import re
 import sys
 import time
 from pathlib import Path
 
-os.environ.setdefault("HF_HOME", r"E:\hf_cache" if os.name == "nt" else os.path.expanduser("~/hf_cache"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np

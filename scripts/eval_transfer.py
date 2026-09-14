@@ -6,15 +6,12 @@ Usage:
     python scripts/eval_transfer.py --run tfidf_lr            # sklearn pipeline saved by baseline_tfidf.py
 """
 import argparse
-import os
 import sys
 from pathlib import Path
 
-os.environ.setdefault("HF_HOME", r"E:\hf_cache")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import joblib
-import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from transformers import AutoModelForSequenceClassification, AutoTokenizer

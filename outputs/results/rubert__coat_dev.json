@@ -1,6 +1,6 @@
 {
   "model": "rubert",
-  "split": "dev",
+  "split": "coat_dev",
   "time": "2026-09-12T16:50:16",
   "accuracy": 0.8578886310904872,
   "f1_macro": 0.8576016108825355,
