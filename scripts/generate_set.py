@@ -69,21 +69,33 @@ def build_jobs(n_per_task: int, min_words: int, max_words: int, seed: int) -> pd
 def clean(raw: str, job) -> str | None:
     t = re.sub(r"<think>.*?</think>", "", raw, flags=re.S).strip()
     t = PREAMBLE.sub("", t).strip().strip('"«»').strip()
+    t = re.sub(r"\*\*|__|(?<!\w)\*(?!\w)|^#+\s*", "", t, flags=re.M).strip()  # markdown emphasis / headers
     if REFUSAL.match(t) or latin_share(t) > 0.3:  # off-task: refusal or non-Russian output
         return None
     if job.task == "continue":
+        head_norm = " ".join(job.head.lower().split())
+        if " ".join(t.lower().split()).startswith(head_norm):  # model echoed the whole prompt head
+            t = t[len(job.head):].lstrip(" ,.;:") if t.lower().startswith(job.head.lower()) else t.split(maxsplit=len(job.head.split()))[-1]
+        elif t.split() and t.split()[0].lower().strip(".,;:!?") == job.head.split()[-1].lower().strip(".,;:!?"):
+            t = " ".join(t.split()[1:])  # model echoed the last prompt word
         if len(t.split()) < max(8, int(0.4 * (job.words - 10))):
             return None
-        last = job.head.split()[-1].lower().strip(".,;:!?")
-        if t.split()[0].lower().strip(".,;:!?") == last:  # model echoed the last prompt word
-            t = " ".join(t.split()[1:])
         t = job.head + " " + t
     words = t.split()
     if len(words) < 5 or t.strip() == job.source_text.strip():
         return None
     cap = int(job.words * 1.5) + 10
     if len(words) > cap:
-        t = " ".join(words[:cap])
+        t = trim_to_sentence(" ".join(words[:cap]), min_keep=int(0.6 * cap))
+    return t
+
+
+def trim_to_sentence(t: str, min_keep: int) -> str:
+    """Cut a truncated text back to its last sentence end, if that keeps at least `min_keep` words."""
+    ends = [m.end() for m in re.finditer(r"[.!?…»\"]+(?=\s|$)", t)]
+    for e in reversed(ends):
+        if len(t[:e].split()) >= min_keep:
+            return t[:e].strip()
     return t
 
 
@@ -143,10 +155,45 @@ class VLLMBackend:
         return [o.outputs[0].text for o in self.llm.generate(texts, sp)]
 
 
+def write_testset(machine: pd.DataFrame, tag: str) -> Path:
+    _, _, test = get_splits()
+    human = test[test.id.isin(machine.source_id.unique())]
+    task_code = {t: i + 1 for i, t in enumerate(PROMPTS)}
+    final = pd.concat([
+        pd.DataFrame({"id": machine.source_id.values * 10 + machine.task.map(task_code).values,  # stable ids
+                      "text": machine.text, "label": 1, "generator": tag, "task": machine.task, "source_id": machine.source_id}),
+        pd.DataFrame({"id": human.id.values * 10, "text": human.text.values, "label": 0, "generator": "Human",
+                      "task": "human", "source_id": human.id.values}),
+    ], ignore_index=True)
+    final["domain"] = "coat"
+    final["corpus"] = f"gen_{tag}"
+    final["split"] = "test"
+    out = OUT_DIR / f"{tag}_testset.parquet"
+    final.to_parquet(out, index=False)
+    print(f"test set: {len(machine)} machine + {len(human)} human -> {out}", flush=True)
+    return out
+
+
+def reclean(tag: str, n: int, min_words: int, max_words: int):
+    """Re-derive cleaned texts from stored raw outputs with the current clean() and rebuild the test set."""
+    path = OUT_DIR / f"{tag}.parquet"
+    gen = pd.read_parquet(path)
+    jobs = build_jobs(n, min_words, max_words, SEED)
+    merged = gen.merge(jobs[["source_id", "task", "source_text", "words", "head"]], on=["source_id", "task"], how="left")
+    assert merged.source_text.notna().all(), "job table does not match the stored generations (different --n?)"
+    texts = [clean(r.raw, r) for r in merged.itertuples()]
+    merged["text"] = texts
+    kept = merged[merged.text.notna()]
+    print(f"{tag}: {len(merged)} raw outputs, {len(merged) - len(kept)} dropped by clean()", flush=True)
+    kept[["source_id", "task", "text", "raw"]].to_parquet(path, index=False)
+    write_testset(kept, tag)
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", required=True)
+    ap.add_argument("--model", default="")
     ap.add_argument("--tag", required=True)
+    ap.add_argument("--reclean", action="store_true", help="re-apply clean() to stored raw outputs and rebuild the test set")
     ap.add_argument("--n", type=int, default=1000, help="sources per task")
     ap.add_argument("--backend", choices=["hf", "vllm"], default="hf")
     ap.add_argument("--quant", choices=["nf4", "bf16"], default="bf16")
@@ -157,6 +204,11 @@ def main():
     args = ap.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    if args.reclean:
+        reclean(args.tag, args.n, args.min_words, args.max_words)
+        return
+    if not args.model:
+        ap.error("--model is required unless --reclean")
     path = OUT_DIR / f"{args.tag}.parquet"
     jobs = build_jobs(args.n, args.min_words, args.max_words, SEED)
     done = pd.read_parquet(path) if path.exists() else pd.DataFrame(columns=["source_id", "task"])
@@ -184,18 +236,7 @@ def main():
             print(f"  {min(i + args.bs, len(todo))}/{len(todo)} generated, {dropped} dropped, {time.time()-t0:.0f}s", flush=True)
 
     machine = pd.DataFrame(rows)
-    _, _, test = get_splits()
-    human = test[test.id.isin(machine.source_id.unique())]
-    final = pd.concat([
-        pd.DataFrame({"text": machine.text, "label": 1, "generator": args.tag, "task": machine.task, "source_id": machine.source_id}),
-        pd.DataFrame({"text": human.text.values, "label": 0, "generator": "Human", "task": "human", "source_id": human.id.values}),
-    ], ignore_index=True)
-    final.insert(0, "id", range(len(final)))
-    final["domain"] = "coat"
-    final["corpus"] = f"gen_{args.tag}"
-    final["split"] = "test"
-    final.to_parquet(OUT_DIR / f"{args.tag}_testset.parquet", index=False)
-    print(f"test set: {len(machine)} machine + {len(human)} human -> {OUT_DIR / (args.tag + '_testset.parquet')}", flush=True)
+    write_testset(machine, args.tag)
     for task in PROMPTS:
         s = machine[machine.task == task].iloc[0]
         print(f"\n[{task}] {s.text[:300]}")
