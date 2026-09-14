@@ -14,7 +14,6 @@ import time
 from pathlib import Path
 
 os.environ.setdefault("HF_HOME", r"E:\hf_cache")
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import numpy as np
