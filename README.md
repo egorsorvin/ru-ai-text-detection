@@ -7,8 +7,6 @@ on two newer corpora, LLMTrace-ru and AINL-Eval 2025, and on two held-out test s
 fine-tuned encoders, zero-shot Binoculars with Russian-capable model pairs, and an encoder trained on corpus
 mixtures with Binoculars features.
 
-The full write-up is in [`report/main.tex`](report/main.tex).
-
 ## Key findings
 
 - **Detectors do not transfer across generator eras.** ruRoBERTa-large trained on CoAT reaches 0.95 AUROC on
