@@ -27,4 +27,3 @@ report/*.bbl
 report/*.blg
 report/*.toc
 report/*.synctex.gz
-report/*.pdf
