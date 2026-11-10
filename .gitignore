@@ -17,6 +17,14 @@ __pycache__/
 .venv/
 *.log
 
-# local notes and the LaTeX report (submitted separately)
+# local notes, third-party papers and LaTeX build files
 docs/vast_ai.md
-report/
+report/kirichenko_same_origin.*
+report/*.aux
+report/*.log
+report/*.out
+report/*.bbl
+report/*.blg
+report/*.toc
+report/*.synctex.gz
+report/*.pdf
